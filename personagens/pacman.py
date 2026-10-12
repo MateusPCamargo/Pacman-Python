@@ -10,8 +10,8 @@ class Pacman:
 
         self.pontuacao = 0
 
-        self.largura = 15
-        self.altura = 15
+        self.largura = 20
+        self.altura = 20
 
         self.velocidade = 3
 
@@ -105,7 +105,6 @@ class Pacman:
         )
 
         self.comer_ponto()
-
 
     def desenhar(self, tela):
         tela.blit(self.imagem, (self.x, self.y))

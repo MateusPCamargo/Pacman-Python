@@ -15,10 +15,10 @@ class Mapa:
             "1333333313313113111131113131",
             "1311111313333333333133333131",
             "1433333313111001113333333341",
-            "1111333113100000013333111311",
-            "3333333113106789013333333333",
-            "1111113113100000013113133311",
-            "1113333113100000013113333311",
+            "1111333113116789113333111311",
+            "3333333113111111113333333333",
+            "1111113113333333333113133311",
+            "1113333113111111113113333311",
             "1113113113111111113113133311",
             "1113113313333353333113133111",
             "1113113313111111113113133111",
@@ -100,4 +100,28 @@ class Mapa:
                     )
                     return x, y
 
-    
+    def definir_fantasma(self, tamanho_bloco):
+        for linha in range(len(self.mapa)):
+            for coluna in range(len(self.mapa[linha])):
+                if self.mapa[linha][coluna] == "6":
+                    x = coluna * tamanho_bloco 
+                    y = linha * tamanho_bloco
+        
+                    self.mapa[linha] = (
+                        self.mapa[linha][:coluna]
+                        + "0" + self.mapa[linha][coluna + 1:]
+                    )
+                    return x, y
+
+    def definir_fantasma2(self, tamanho_bloco):
+            for linha in range(len(self.mapa)):
+                for coluna in range(len(self.mapa[linha])):
+                    if self.mapa[linha][coluna] == "7":
+                        x = coluna * tamanho_bloco 
+                        y = linha * tamanho_bloco
+            
+                        self.mapa[linha] = (
+                            self.mapa[linha][:coluna]
+                            + "0" + self.mapa[linha][coluna + 1:]
+                        )
+                        return x, y

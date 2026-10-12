@@ -3,6 +3,7 @@ import random
 import sys
 from personagens.pacman import Pacman
 from mapas.mapa1 import Mapa
+from personagens.fantasma import Fantasma
 
 pygame.init()
 
@@ -20,8 +21,10 @@ pygame.display.set_caption("Pac-Man")
 
 mapa = Mapa(tela)
 pacman_x, pacman_y = mapa.definir_pacman(TAMANHO_BLOCO)
+fantasma_x, fantasma_y = mapa.definir_fantasma(TAMANHO_BLOCO)
 
 pacman = Pacman(pacman_x, pacman_y, mapa, pontuacao)
+fantasma = Fantasma(fantasma_x, fantasma_y, mapa)
 
 loop = True
 
@@ -38,6 +41,8 @@ while (loop):
     
 
     pacman.atualizar(dt)
+    alvo = (pacman.x, pacman.y)
+    fantasma.atualizar(dt, alvo)
 
     tela.fill((0, 0, 0))
 
@@ -47,6 +52,7 @@ while (loop):
     tela.blit(texto, (10, 10))
 
     pacman.desenhar(tela)
+    fantasma.desenhar_fantasma(tela)
 
     pygame.display.flip()
 
