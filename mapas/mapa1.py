@@ -153,3 +153,6 @@ class Mapa:
                                 + "0" + self.mapa[linha][coluna + 1:]
                             )
                             return x, y
+
+    def pontos_restantes(self):
+        return sum(linha.count("3") + linha.count("4") for linha in self.mapa)

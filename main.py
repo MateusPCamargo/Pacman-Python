@@ -40,6 +40,8 @@ fantasmas = [blinky, pinky, inky, clyde]
 vidas = 3
 game_over = False
 pausa = 0 
+vitoria = False
+fonte_grande = pygame.font.Font(None, 48)
 
 loop = True
 
@@ -51,9 +53,11 @@ while (loop):
                 pygame.quit()
                 sys.exit()
 
+    if not game_over and not vitoria and mapa.pontos_restantes() == 0:
+        vitoria = True
     if pausa > 0:
         pausa -= dt
-    elif not game_over:
+    elif not game_over and not vitoria:
         pacman.atualizar(dt)
 
         if pacman.pegou_poder:
@@ -89,8 +93,6 @@ while (loop):
 
     mapa.desenhar_mapa()
 
-    
-
     pacman.desenhar(tela)
     for fantasma in fantasmas:
         fantasma.desenhar_fantasma(tela)
@@ -101,7 +103,13 @@ while (loop):
     tela.blit(fonte.render(f"Vidas: {vidas}", True, (255, 255, 255)), (10, 14))
     
     if game_over:
-        texto = fonte.render("GAME OVER", True, (255, 0, 0))
+        tela.fill((0, 0, 0))
+        texto = fonte_grande.render("GAME OVER", True, (255, 0, 0))
+        tela.blit(texto, texto.get_rect(center=tela.get_rect().center))
+
+    if vitoria:
+        tela.fill((0, 0, 0))
+        texto = fonte_grande.render("VOCÊ VENCEU!", True, (0, 255, 0))
         tela.blit(texto, texto.get_rect(center=tela.get_rect().center))
 
     pygame.display.flip()
