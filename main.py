@@ -19,22 +19,26 @@ fonte = pygame.font.Font(None, 16)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Pac-Man")
 
-
 mapa = Mapa(tela)
+
+
 pacman_x, pacman_y = mapa.definir_pacman(TAMANHO_BLOCO)
 blinky_x, blinky_y = mapa.definir_Blinky(TAMANHO_BLOCO)
 pinky_x, pinky_y = mapa.definir_Pinky(TAMANHO_BLOCO)
 inky_x, inky_y = mapa.definir_Inky(TAMANHO_BLOCO)
 clyde_x, clyde_y = mapa.definir_Clyde(TAMANHO_BLOCO)
 
-
 pacman = Pacman(pacman_x, pacman_y, mapa, pontuacao)
 blinky = Blinky(blinky_x, blinky_y, mapa)
 pinky = Pinky(pinky_x, pinky_y, mapa)
 inky = Inky(inky_x, inky_y, mapa)
 clyde = Clyde(clyde_x, clyde_y, mapa)
-
 fantasmas = [blinky, pinky, inky, clyde]
+
+
+vidas = 3
+game_over = False
+pausa = 0 
 
 loop = True
 
@@ -46,12 +50,26 @@ while (loop):
                 pygame.quit()
                 sys.exit()
 
-    
+    if pausa > 0:
+        pausa -= dt
+    elif not game_over:
+        pacman.atualizar(dt)
 
-    pacman.atualizar(dt)
-    for fantasma in fantasmas:
-        alvo = fantasma.calcular_alvo(pacman, blinky)
-        fantasma.atualizar(dt, alvo)
+        for fantasma in fantasmas:
+            alvo = fantasma.calcular_alvo(pacman, blinky)
+            fantasma.atualizar(dt, alvo)
+
+        for fantasma in fantasmas:
+            if fantasma.colidiu_com(pacman):
+                vidas -= 1
+                if vidas <= 0:
+                    game_over = True
+                else:
+                    pacman.resetar()
+                    for f in fantasmas:
+                        f.resetar()
+                    pausa = 1000              
+                break 
 
     
 
@@ -59,12 +77,20 @@ while (loop):
 
     mapa.desenhar_mapa()
 
-    texto = fonte.render(f"Pontuação: {pacman.pontuacao}", True, (255, 255, 255))
-    tela.blit(texto, (10, 10))
+    
 
     pacman.desenhar(tela)
     for fantasma in fantasmas:
         fantasma.desenhar_fantasma(tela)
+
+    texto = fonte.render(f"Pontuação: {pacman.pontuacao}", True, (255, 255, 255))
+    tela.blit(texto, (10, 4))
+
+    tela.blit(fonte.render(f"Vidas: {vidas}", True, (255, 255, 255)), (10, 14))
+    
+    if game_over:
+        texto = fonte.render("GAME OVER", True, (255, 0, 0))
+        tela.blit(texto, texto.get_rect(center=tela.get_rect().center))
 
     pygame.display.flip()
 

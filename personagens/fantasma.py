@@ -23,8 +23,13 @@ class Fantasma:
 
         self.x = x
         self.y = y
+        self.x_inicial = x
+        self.y_inicial = y
+
         self.mapa = mapa
+
         self.direcao = "direita"
+        self.direcao_inicial = self.direcao
         
         self.velocidade = 2
 
@@ -130,6 +135,15 @@ class Fantasma:
 
     def calcular_alvo(self, pacman, blinky=None):
         return (pacman.x, pacman.y)
+
+    def colidiu_com(self, pacman):
+        distancia = 12      # px entre as posições; 20 = sprites encostando, menor = mais permissivo
+        return abs(self.x - pacman.x) < distancia and abs(self.y - pacman.y) < distancia
+
+    def resetar(self):
+        self.x = self.x_inicial
+        self.y = self.y_inicial
+        self.direcao = self.direcao_inicial
 
 
 
