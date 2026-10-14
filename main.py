@@ -3,7 +3,7 @@ import random
 import sys
 from personagens.pacman import Pacman
 from mapas.mapa1 import Mapa
-from personagens.fantasma import Fantasma
+from personagens.fantasma import Blinky, Pinky, Inky, Clyde
 
 pygame.init()
 
@@ -15,20 +15,28 @@ ALTURA = 24 * TAMANHO_BLOCO
 pontuacao = 0
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
+fonte = pygame.font.Font(None, 16)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Pac-Man")
 
 
 mapa = Mapa(tela)
 pacman_x, pacman_y = mapa.definir_pacman(TAMANHO_BLOCO)
-fantasma_x, fantasma_y = mapa.definir_fantasma(TAMANHO_BLOCO)
+blinky_x, blinky_y = mapa.definir_Blinky(TAMANHO_BLOCO)
+pinky_x, pinky_y = mapa.definir_Pinky(TAMANHO_BLOCO)
+inky_x, inky_y = mapa.definir_Inky(TAMANHO_BLOCO)
+clyde_x, clyde_y = mapa.definir_Clyde(TAMANHO_BLOCO)
+
 
 pacman = Pacman(pacman_x, pacman_y, mapa, pontuacao)
-fantasma = Fantasma(fantasma_x, fantasma_y, mapa)
+blinky = Blinky(blinky_x, blinky_y, mapa)
+pinky = Pinky(pinky_x, pinky_y, mapa)
+inky = Inky(inky_x, inky_y, mapa)
+clyde = Clyde(clyde_x, clyde_y, mapa)
+
+fantasmas = [blinky, pinky, inky, clyde]
 
 loop = True
-
-fonte = pygame.font.Font(None, 16)
 
 while (loop):
     dt = clock.tick(60)
@@ -41,8 +49,11 @@ while (loop):
     
 
     pacman.atualizar(dt)
-    alvo = (pacman.x, pacman.y)
-    fantasma.atualizar(dt, alvo)
+    for fantasma in fantasmas:
+        alvo = fantasma.calcular_alvo(pacman, blinky)
+        fantasma.atualizar(dt, alvo)
+
+    
 
     tela.fill((0, 0, 0))
 
@@ -52,7 +63,8 @@ while (loop):
     tela.blit(texto, (10, 10))
 
     pacman.desenhar(tela)
-    fantasma.desenhar_fantasma(tela)
+    for fantasma in fantasmas:
+        fantasma.desenhar_fantasma(tela)
 
     pygame.display.flip()
 

@@ -100,7 +100,7 @@ class Mapa:
                     )
                     return x, y
 
-    def definir_fantasma(self, tamanho_bloco):
+    def definir_Blinky(self, tamanho_bloco):
         for linha in range(len(self.mapa)):
             for coluna in range(len(self.mapa[linha])):
                 if self.mapa[linha][coluna] == "6":
@@ -113,7 +113,7 @@ class Mapa:
                     )
                     return x, y
 
-    def definir_fantasma2(self, tamanho_bloco):
+    def definir_Pinky(self, tamanho_bloco):
             for linha in range(len(self.mapa)):
                 for coluna in range(len(self.mapa[linha])):
                     if self.mapa[linha][coluna] == "7":
@@ -125,3 +125,29 @@ class Mapa:
                             + "0" + self.mapa[linha][coluna + 1:]
                         )
                         return x, y
+
+    def definir_Inky(self, tamanho_bloco):
+                for linha in range(len(self.mapa)):
+                    for coluna in range(len(self.mapa[linha])):
+                        if self.mapa[linha][coluna] == "8":
+                            x = coluna * tamanho_bloco 
+                            y = linha * tamanho_bloco
+                
+                            self.mapa[linha] = (
+                                self.mapa[linha][:coluna]
+                                + "0" + self.mapa[linha][coluna + 1:]
+                            )
+                            return x, y
+
+    def definir_Clyde(self, tamanho_bloco):
+                for linha in range(len(self.mapa)):
+                    for coluna in range(len(self.mapa[linha])):
+                        if self.mapa[linha][coluna] == "9":
+                            x = coluna * tamanho_bloco 
+                            y = linha * tamanho_bloco
+                
+                            self.mapa[linha] = (
+                                self.mapa[linha][:coluna]
+                                + "0" + self.mapa[linha][coluna + 1:]
+                            )
+                            return x, y
