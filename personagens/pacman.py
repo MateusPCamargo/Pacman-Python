@@ -101,6 +101,8 @@ class Pacman:
             self.x += dx * self.velocidade
             self.y += dy * self.velocidade
 
+        self.x = self.x % self.mapa.largura_mapa
+
         self.tempo_animacao += dt
 
         if self.tempo_animacao >= 150:
@@ -160,7 +162,11 @@ class Pacman:
         return any(self.mapa.verificar_parede(px, py) for px, py in pontos)
 
     def desenhar(self, tela):
-        tela.blit(self.imagem, (self.x + self.deslocamento, self.y + self.deslocamento))
+        largura = self.mapa.largura_mapa
+        px = self.x + self.deslocamento
+        py = self.y + self.deslocamento
+        for desvio in (-largura, 0, largura):
+            tela.blit(self.imagem, (px + desvio, py))
 
     def resetar(self):
         self.x = self.x_inicial
@@ -172,7 +178,7 @@ class Pacman:
         self.tempo_animacao = 0
 
     def comer_ponto(self):
-        coluna = int((self.x + self.tamanho_bloco // 2) // self.tamanho_bloco)
+        coluna = int((self.x + self.tamanho_bloco // 2) // self.tamanho_bloco) % len(self.mapa.mapa[0])
         linha = int((self.y + self.tamanho_bloco // 2) // self.tamanho_bloco)
 
         celula = self.mapa.mapa[linha][coluna]

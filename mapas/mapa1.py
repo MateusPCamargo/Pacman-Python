@@ -35,6 +35,9 @@ class Mapa:
             "1111111111111111111111111111",
             ]
 
+        self.colunas = len(self.mapa[0])
+        self.largura_mapa = self.colunas * self.tamanho_bloco
+
 
     def desenhar_mapa(self):
         for linha, conteudo in enumerate(self.mapa):
@@ -82,8 +85,7 @@ class Mapa:
         if linha < 0 or linha >= len(self.mapa):
             return True
 
-        if coluna < 0 or coluna >= len(self.mapa[linha]):
-            return True
+        coluna = coluna % len(self.mapa[linha])     
 
         return self.mapa[linha][coluna] == "1"
 

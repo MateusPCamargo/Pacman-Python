@@ -50,10 +50,14 @@ class Fantasma:
     def desenhar_fantasma(self, tela):
         imagem = self.imagem_normal
         if self.assustado:
+            # nos últimos 2 segundos pisca entre azul e normal
             piscando = self.tempo_assustado < 2000 and int(self.tempo_assustado // 250) % 2 == 0
             if not piscando:
                 imagem = self.imagem_assustada
-        tela.blit(imagem, (self.x + self.deslocamento, self.y + self.deslocamento))
+
+        largura_mapa = self.mapa.largura_mapa
+        for desvio in (-largura_mapa, 0, largura_mapa):
+            tela.blit(imagem, (self.x + self.deslocamento + desvio, self.y + self.deslocamento))
 
 
     def colisao(self, x, y):
@@ -71,30 +75,31 @@ class Fantasma:
 
     def escolher_direcao(self, alvo=None):
         opcoes = [d for d in DIRECOES
-                if d != OPOSTA[self.direcao] and self.livre(d, self.tamanho_bloco)]
+                  if d != OPOSTA[self.direcao] and self.livre(d, self.tamanho_bloco)]
 
         if not opcoes:                      
             return OPOSTA[self.direcao]
 
-        if alvo is None or self.assustado:                    
+        if alvo is None or self.assustado:   
             return random.choice(opcoes)
 
-        
-        meta = (int((alvo[0] + self.tamanho_bloco // 2) // self.tamanho_bloco),
+        colunas = self.mapa.colunas
+
+        meta = (int((alvo[0] + self.tamanho_bloco // 2) // self.tamanho_bloco) % colunas,
                 int((alvo[1] + self.tamanho_bloco // 2) // self.tamanho_bloco))
         dist = self.mapa_distancias(meta)
 
-        col = int(self.x // self.tamanho_bloco)
+        col = int(self.x // self.tamanho_bloco) % colunas
         lin = int(self.y // self.tamanho_bloco)
 
         def custo(d):
             dx, dy = DIRECOES[d]
-            return dist.get((col + dx, lin + dy), float("inf"))
+            return dist.get(((col + dx) % colunas, lin + dy), float("inf"))
 
         melhor = min(opcoes, key=custo)
-        if custo(melhor) == float("inf"):    # alvo inalcançável: anda aleatório
+        if custo(melhor) == float("inf"):    
             return random.choice(opcoes)
-        return melhor   
+        return melhor  
 
     def atualizar(self, dt, alvo=None):
         if self.assustado:
@@ -111,13 +116,16 @@ class Fantasma:
             self.x += dx * self.velocidade
             self.y += dy * self.velocidade
 
+        self.x = self.x % self.mapa.largura_mapa
+
     def mapa_distancias(self, meta):
+        colunas = self.mapa.colunas
         dist = {meta: 0}
         fila = deque([meta])
         while fila:
             col, lin = fila.popleft()
             for dx, dy in DIRECOES.values():
-                viz = (col + dx, lin + dy)
+                viz = ((col + dx) % colunas, lin + dy)
                 if viz in dist:
                     continue
                 centro_x = viz[0] * self.tamanho_bloco + self.tamanho_bloco // 2
@@ -155,8 +163,11 @@ class Fantasma:
         return (pacman.x, pacman.y)
 
     def colidiu_com(self, pacman):
-        distancia = 12      
-        return abs(self.x - pacman.x) < distancia and abs(self.y - pacman.y) < distancia
+        distancia = 12
+        largura = self.mapa.largura_mapa
+        dx = abs(self.x - pacman.x)
+        dx = min(dx, largura - dx)        
+        return dx < distancia and abs(self.y - pacman.y) < distancia
 
     def resetar(self):
         self.x = self.x_inicial
