@@ -21,12 +21,12 @@ class Pacman:
         self.deslocamento = (self.tamanho_bloco - 20) // 2
 
         self.pontuacao = 0
+        self.pegou_poder = False
 
         self.largura = 20
         self.altura = 20
 
         self.velocidade = 3
-
         self.direcao = "cima"
 
         self.direcao_inicial = self.direcao
@@ -175,8 +175,15 @@ class Pacman:
         coluna = int((self.x + self.tamanho_bloco // 2) // self.tamanho_bloco)
         linha = int((self.y + self.tamanho_bloco // 2) // self.tamanho_bloco)
 
-        if self.mapa.mapa[linha][coluna] == "3":
-            self.pontuacao += 10
+        celula = self.mapa.mapa[linha][coluna]
+
+        if celula == "3" or celula == "4":
+            if celula == "3":
+                self.pontuacao += 10
+            else:
+                self.pontuacao += 50
+                self.pegou_poder = True      # o main lê isso e assusta os fantasmas
+
             self.mapa.mapa[linha] = (
                 self.mapa.mapa[linha][:coluna]
                 + "0"

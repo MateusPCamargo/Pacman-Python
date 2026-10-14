@@ -13,6 +13,7 @@ LARGURA = 28 * TAMANHO_BLOCO
 ALTURA = 24 * TAMANHO_BLOCO
 
 pontuacao = 0
+pontos_fantasma = 200
 
 tela = pygame.display.set_mode((LARGURA, ALTURA))
 fonte = pygame.font.Font(None, 16)
@@ -55,21 +56,32 @@ while (loop):
     elif not game_over:
         pacman.atualizar(dt)
 
+        if pacman.pegou_poder:
+            pacman.pegou_poder = False
+            pontos_fantasma = 200
+            for f in fantasmas:
+                f.assustar(6000)                # duração em ms
+
         for fantasma in fantasmas:
             alvo = fantasma.calcular_alvo(pacman, blinky)
             fantasma.atualizar(dt, alvo)
 
         for fantasma in fantasmas:
             if fantasma.colidiu_com(pacman):
-                vidas -= 1
-                if vidas <= 0:
-                    game_over = True
+                if fantasma.assustado:
+                    fantasma.resetar()
+                    pacman.pontuacao += pontos_fantasma
+                    pontos_fantasma *= 2        # 200, 400, 800, 1600
                 else:
-                    pacman.resetar()
-                    for f in fantasmas:
-                        f.resetar()
-                    pausa = 1000              
-                break 
+                    vidas -= 1
+                    if vidas <= 0:
+                        game_over = True
+                    else:
+                        pacman.resetar()
+                        for f in fantasmas:
+                            f.resetar()
+                        pausa = 1000
+                    break 
 
     
 

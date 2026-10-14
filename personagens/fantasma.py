@@ -32,16 +32,28 @@ class Fantasma:
         self.direcao_inicial = self.direcao
         
         self.velocidade = 2
+        self.velocidade_normal = self.velocidade
+        self.velocidade_assustado = 1          
+        self.velocidade_desejada = self.velocidade
+        self.assustado = False
+        self.tempo_assustado = 0
 
         self.sprite = pygame.image.load(self.SPRITE)
 
         self.imagem = pygame.transform.scale(self.sprite, (self.largura, self.altura))
+        self.imagem_normal = self.imagem
+        self.imagem_assustada = self.criar_imagem_assustada()
 
         self.tamanho_bloco = 24
         self.deslocamento = (self.tamanho_bloco - self.largura) // 2
 
     def desenhar_fantasma(self, tela):
-        tela.blit(self.imagem, (self.x + self.deslocamento, self.y + self.deslocamento))
+        imagem = self.imagem_normal
+        if self.assustado:
+            piscando = self.tempo_assustado < 2000 and int(self.tempo_assustado // 250) % 2 == 0
+            if not piscando:
+                imagem = self.imagem_assustada
+        tela.blit(imagem, (self.x + self.deslocamento, self.y + self.deslocamento))
 
 
     def colisao(self, x, y):
@@ -61,13 +73,13 @@ class Fantasma:
         opcoes = [d for d in DIRECOES
                 if d != OPOSTA[self.direcao] and self.livre(d, self.tamanho_bloco)]
 
-        if not opcoes:                       # beco sem saída
+        if not opcoes:                      
             return OPOSTA[self.direcao]
 
-        if alvo is None:                     # aleatório (modo assustado)
+        if alvo is None or self.assustado:                    
             return random.choice(opcoes)
 
-        # tile onde está o alvo (usa o centro, para funcionar com o Pac-Man entre tiles)
+        
         meta = (int((alvo[0] + self.tamanho_bloco // 2) // self.tamanho_bloco),
                 int((alvo[1] + self.tamanho_bloco // 2) // self.tamanho_bloco))
         dist = self.mapa_distancias(meta)
@@ -85,7 +97,13 @@ class Fantasma:
         return melhor   
 
     def atualizar(self, dt, alvo=None):
+        if self.assustado:
+            self.tempo_assustado -= dt
+            if self.tempo_assustado <= 0:
+                self.normalizar()
+
         if self.alinhado():
+            self.velocidade = self.velocidade_desejada   
             self.direcao = self.escolher_direcao(alvo)
 
         if self.livre(self.direcao):
@@ -137,15 +155,31 @@ class Fantasma:
         return (pacman.x, pacman.y)
 
     def colidiu_com(self, pacman):
-        distancia = 12      # px entre as posições; 20 = sprites encostando, menor = mais permissivo
+        distancia = 12      
         return abs(self.x - pacman.x) < distancia and abs(self.y - pacman.y) < distancia
 
     def resetar(self):
         self.x = self.x_inicial
         self.y = self.y_inicial
         self.direcao = self.direcao_inicial
+        self.normalizar()
+        self.velocidade = self.velocidade_normal
 
+    def assustar(self, duracao=6000):
+        if not self.assustado:
+            self.direcao = OPOSTA[self.direcao]      
+        self.assustado = True
+        self.tempo_assustado = duracao
+        self.velocidade_desejada = self.velocidade_assustado
 
+    def normalizar(self):
+        self.assustado = False
+        self.tempo_assustado = 0
+        self.velocidade_desejada = self.velocidade_normal
+
+    def criar_imagem_assustada(self):
+        img = pygame.image.load("assets/fantasmas/assustado.png")
+        return pygame.transform.scale(img, (self.largura, self.altura))
 
 class Blinky(Fantasma):
     SPRITE = "assets/fantasmas/blinky.png"
