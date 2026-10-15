@@ -20,6 +20,14 @@ fonte = pygame.font.Font(None, 16)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Pac-Man")
 
+som_ponto = pygame.mixer.Sound("assets/sons/comer.wav")
+som_poder = pygame.mixer.Sound("assets/sons/poder.wav")
+som_fantasma = pygame.mixer.Sound("assets/sons/comer_fantasmas.wav")
+som_morte = pygame.mixer.Sound("assets/sons/morte.wav")
+pygame.mixer.set_reserved(1)                 
+canal_ponto = pygame.mixer.Channel(0)
+som_ponto.set_volume(0.3)
+
 def novo_jogo():
     mapa = Mapa(tela)
 
@@ -70,11 +78,15 @@ while (loop):
     if pausa > 0:
         pausa -= dt
     elif not game_over and not vitoria:
+        pontos_antes = pacman.pontuacao
         pacman.atualizar(dt)
+        if pacman.pontuacao - pontos_antes == 10 and not canal_ponto.get_busy():
+            canal_ponto.play(som_ponto)
 
         if pacman.pegou_poder:
             pacman.pegou_poder = False
             pontos_fantasma = 200
+            som_poder.play()
             for f in fantasmas:
                 f.assustar(6000)                # duração em ms
 
@@ -85,11 +97,13 @@ while (loop):
         for fantasma in fantasmas:
             if fantasma.colidiu_com(pacman):
                 if fantasma.assustado:
+                    som_fantasma.play()
                     fantasma.resetar()
                     pacman.pontuacao += pontos_fantasma
                     pontos_fantasma *= 2        # 200, 400, 800, 1600
                 else:
                     vidas -= 1
+                    som_morte.play()
                     if vidas <= 0:
                         game_over = True
                     else:
